@@ -54,19 +54,18 @@ function clearCanvas() {
 
 // Mettre à jour la position du robot
 function updatePosition(keyCode) {
-  // Déplacement horizontal
   switch (keyCode) {
+    case 'ArrowUp':
+      if (robotY - 20 > 0) robotY -= speed; // Inclure la hauteur de la tête du robot
+      break;
+    case 'ArrowDown':
+      if (robotY + robotHeight + 20 <= canvas.height) robotY += speed; // Ajouter un tampon pour les jambes
+      break;
     case 'ArrowLeft':
-      if (robotX > 0) robotX -= speed;
+      if (robotX > 0) robotX -= speed; // Empêcher que le côté gauche du robot sorte
       break;
     case 'ArrowRight':
-      if (robotX + robotWidth < canvas.width) robotX += speed;
-      break;
-    case 'Space': // Saut
-      if (isOnGround) {
-        velocityY = jumpStrength; // Appliquer une impulsion vers le haut
-        isOnGround = false; // Le robot n'est plus au sol
-      }
+      if (robotX + robotWidth <= canvas.width) robotX += speed; // Empêcher que le côté droit du robot sorte
       break;
   }
 }
