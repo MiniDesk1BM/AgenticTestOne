@@ -56,7 +56,10 @@ function clearCanvas() {
 function updatePosition(keyCode) {
   switch (keyCode) {
     case 'ArrowUp':
-      if (robotY - 20 > 0) robotY -= speed; // Inclure la hauteur de la tête du robot
+      if (isOnGround) { // Permettre le saut uniquement si le robot est au sol
+        velocityY = jumpStrength; // Appliquer la force du saut
+        isOnGround = false; // Le robot quitte le sol
+      }
       break;
     case 'ArrowDown':
       if (robotY + robotHeight + 20 <= canvas.height) robotY += speed; // Ajouter un tampon pour les jambes
@@ -70,7 +73,7 @@ function updatePosition(keyCode) {
   }
 }
 
-// Appliquer la gravité
+// Appliquer la gravité avec gestion des offsets
 function applyGravity() {
   if (!isOnGround) {
     velocityY += gravity; // Ajouter l'effet de la gravité
@@ -82,6 +85,14 @@ function applyGravity() {
     robotY = canvas.height - robotHeight; // Positionner le robot au niveau du sol
     velocityY = 0; // Réinitialiser la vitesse verticale
     isOnGround = true; // Le robot est au sol
+  } else {
+    isOnGround = false; // Le robot n'est pas au sol
+  }
+
+  // Vérifier si le robot touche le plafond
+  if (robotY < 0) {
+    robotY = 0; // Empêcher le robot de sortir par le haut
+    velocityY = 0; // Réinitialiser la vitesse verticale
   }
 }
 
