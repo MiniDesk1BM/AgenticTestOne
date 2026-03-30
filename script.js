@@ -15,6 +15,12 @@ const robotHeight = 50;
 // Vitesse de déplacement
 const speed = 20;
 
+// Gravité et saut
+const gravity = 1; // Force de la gravité
+let velocityY = 0; // Vitesse verticale
+const jumpStrength = -15; // Force du saut
+let isOnGround = false; // Vérifie si le robot est au sol
+
 // Dessiner le robot
 function drawRobot() {
   // Corps
@@ -48,28 +54,50 @@ function clearCanvas() {
 
 // Mettre à jour la position du robot
 function updatePosition(keyCode) {
+  // Déplacement horizontal
   switch (keyCode) {
-    case 'ArrowUp':
-      if (robotY > 0) robotY -= speed;
-      break;
-    case 'ArrowDown':
-      if (robotY + robotHeight + 20 < canvas.height) robotY += speed;
-      break;
     case 'ArrowLeft':
       if (robotX > 0) robotX -= speed;
       break;
     case 'ArrowRight':
-      if (robotX + robotWidth + 10 < canvas.width) robotX += speed;
+      if (robotX + robotWidth < canvas.width) robotX += speed;
+      break;
+    case 'Space': // Saut
+      if (isOnGround) {
+        velocityY = jumpStrength; // Appliquer une impulsion vers le haut
+        isOnGround = false; // Le robot n'est plus au sol
+      }
       break;
   }
+}
+
+// Appliquer la gravité
+function applyGravity() {
+  if (!isOnGround) {
+    velocityY += gravity; // Ajouter l'effet de la gravité
+    robotY += velocityY; // Mettre à jour la position verticale
+  }
+
+  // Vérifier si le robot touche le sol
+  if (robotY + robotHeight >= canvas.height) {
+    robotY = canvas.height - robotHeight; // Positionner le robot au niveau du sol
+    velocityY = 0; // Réinitialiser la vitesse verticale
+    isOnGround = true; // Le robot est au sol
+  }
+}
+
+// Boucle d'animation
+function gameLoop() {
+  clearCanvas();
+  applyGravity();
+  drawRobot();
+  requestAnimationFrame(gameLoop); // Appeler la prochaine frame
 }
 
 // Gestion des événements clavier
 window.addEventListener('keydown', (event) => {
   updatePosition(event.key);
-  clearCanvas();
-  drawRobot();
 });
 
 // Initialisation
-drawRobot();
+gameLoop();
